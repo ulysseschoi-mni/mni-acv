@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Permanent+Marker&family=Nanum+Pen+Script&display=swap');
+
+:root {
+    --bg-color: #ffffff;
+    --text-color: #111111;
+    --accent-color: #CCCCFF;
+    /* Periwinkle */
+    --font-mono: 'Courier Prime', monospace;
+    --font-scribble: 'Nanum Pen Script', cursive;
+    /* Using Nanum Pen Script for a natural handwritten feel */
+    --font-marker: 'Permanent Marker', cursive;
+}
+
+body {
+    font-family: var(--font-mono);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+/* Utilities */
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+.font-scribble {
+    font-family: var(--font-scribble);
+}
+
+.font-marker {
+    font-family: var(--font-marker);
+}
+
+.text-accent {
+    color: var(--accent-color);
+}
+
+.bg-accent {
+    background-color: var(--accent-color);
+}
+
+/* Layout */
+.section {
+    min-height: 100vh;
+    padding-top: 80px;
+    /* Header height */
+    padding-bottom: 40px;
+    display: none;
+    /* Single Page App behavior */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.section.active {
+    /* display: block;  <-- REMOVED: Let specific sections define their display (flex, block, etc.) */
+    display: unset;
+    /* Or handled via JS removing 'hidden' class, but here we just need to NOT override flex */
+    opacity: 1;
+}
+
+/* Ensure sections that need to be visible are visible. 
+   Actually, a better way is to toggle a 'hidden' utility class, but sticking to the current pattern:
+   We will rely on the HTML having 'flex' or 'block' and .section just handling the opacity/transition.
+   BUT 'display: none' overrides everything. 
+   So we need a specific rule for active.
+*/
+.section.active {
+    display: flex;
+    /* Default to flex for centering, we can override if needed, or better: use a utility class approach in HTML */
+    flex-direction: column;
+}
+
+/* Wait, not all sections are flex column. 
+   Better approach: 
+   .section { display: none; }
+   .section.active { display: flex; } (if we want them all to ideally be full screen containers)
+   OR 
+   Just use inline styles or Tailwind's 'hidden' class in JS.
+   
+   Let's stick to modifying the CSS to be safe.
+*/
+
+.section.active {
+    display: flex;
+    /* Most sections (Home, Signin) need flex. Drops/Room might need block? */
+}
+
+/* Actually, Room and Drops have 'max-w-6xl mx-auto' inside. Flex column works for them too if we just let children expand.
+   But let's make it cleaner. 
+   I will change the JS to simply remove 'display: none' style or toggle a class that sets display: flex/block appropriately.
+   
+   Let's update CSS to just handle the generic active state as 'flex' effectively for the full-screen centered ones, 
+   and we can add specific overrides if needed.
+   
+   Actually, 'Home' and 'Sign In' have 'flex' class in HTML. 
+   'Room' and 'Drops' do NOT have 'flex' class in HTML currently, they just rely on block layout.
+   
+   The issue is:
+   .section { display: none }
+   .section.active { display: block } -> overrides 'flex' class in HTML if specificity is higher or same layer?
+   Tailwind classes are usually usually !important or high specificity? No, they are just classes.
+   
+   Fix: changing .section.active to NOT specify display, but allow the HTML class to dictate it.
+   But we need to override the base .section { display: none }.
+   
+   Strategy:
+   1. Remove 'display: none' from .section
+   2. Use a specific utility '.hidden-section' { display: none }
+   3. JS toggles that class.
+*/
+
+.hidden-section {
+    display: none !important;
+}
+
+.section {
+    min-height: 100vh;
+    padding-top: 80px;
+    padding-bottom: 40px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.section.active {
+    opacity: 1;
+}
+
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Specific Component Styles can follow... */
+/* Navigation, Buttons, Inputs will be defined inline or here as we build */

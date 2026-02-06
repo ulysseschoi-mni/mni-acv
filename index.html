@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNI ACV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#111',
+                            white: '#fff',
+                            periwinkle: '#CCCCFF'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['"Courier Prime"', 'monospace'],
+                        scribble: ['"Nanum Pen Script"', 'cursive'],
+                        marker: ['"Permanent Marker"', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="antialiased overflow-hidden">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen"
+        class="fixed inset-0 z-50 bg-white flex flex-col justify-center items-center p-8 text-center transition-transform duration-1000">
+        <div class="relative w-full h-full flex flex-col items-center justify-center">
+
+            <!-- Sequence Items (Absolute centered) -->
+            <div id="intro-text-1" class="absolute font-mono text-xl opacity-0 transition-opacity duration-500">mee
+            </div>
+            <div id="intro-text-2" class="absolute font-mono text-xl opacity-0 transition-opacity duration-500">mni acv
+            </div>
+
+            <!-- Final State Container -->
+            <div id="final-intro-container"
+                class="flex flex-col items-center justify-center transition-all duration-1000 transform translate-y-4 opacity-0">
+                <!-- Switched to font-scribble for thinner look, explicit font-normal -->
+                <h1 id="intro-title"
+                    class="font-scribble text-7xl md:text-9xl tracking-tighter mb-8 font-normal rotate-[-2deg]">mni acv
+                </h1>
+
+                <div id="start-btn-container" class="transition-transform duration-1000">
+                    <button id="start-btn" onclick="app.enterSite()"
+                        class="font-scribble text-4xl border-2 border-black px-6 py-2 hover:bg-black hover:text-white transition-all transform hover:-rotate-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        Start !
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <header id="main-nav"
+        class="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-40 bg-white/90 backdrop-blur-sm border-b-2 border-black hidden opacity-0 transition-opacity duration-500">
+        <!-- Switched to font-scribble and larger size to compensate for thinner weight -->
+        <a href="#home" onclick="app.navigate('home')"
+            class="font-scribble text-4xl md:text-5xl z-50 hover:rotate-2 transition-transform font-bold">mni acv</a>
+
+        <nav class="hidden md:flex space-x-8">
+            <button onclick="app.navigate('home')"
+                class="font-bold font-mono hover:bg-brand-periwinkle px-2 hover:-rotate-1 transition-all">HOME</button>
+            <button onclick="app.navigate('room')"
+                class="font-bold font-mono hover:bg-brand-periwinkle px-2 hover:rotate-1 transition-all">ROOM</button>
+            <button onclick="app.navigate('drops')"
+                class="font-bold font-mono hover:bg-brand-periwinkle px-2 hover:-rotate-1 transition-all text-red-600">DROPS</button>
+            <button onclick="app.navigate('signin')"
+                class="font-bold font-mono hover:bg-brand-periwinkle px-2 hover:rotate-1 transition-all">SIGN
+                IN</button>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobile-menu-btn" onclick="app.toggleMenu()"
+            class="md:hidden font-mono font-bold border-2 border-black px-2 py-1 text-sm bg-white">MENU</button>
+
+        <!-- Mobile Dropdown -->
+        <div id="mobile-menu"
+            class="absolute top-full left-0 w-full bg-white border-b-2 border-black p-4 flex flex-col space-y-4 hidden shadow-xl">
+            <button onclick="app.navigate('home')" class="text-left font-mono font-bold text-xl">HOME</button>
+            <button onclick="app.navigate('room')" class="text-left font-mono font-bold text-xl">ROOM</button>
+            <button onclick="app.navigate('drops')"
+                class="text-left font-mono font-bold text-xl text-red-600">DROPS</button>
+            <button onclick="app.navigate('signin')" class="text-left font-mono font-bold text-xl">SIGN IN</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main id="app-container" class="relative min-h-screen">
+
+        <!-- HOME SECTION -->
+        <section id="home" class="section active px-4 pt-32 pb-20">
+            <!-- Hero Block -->
+            <div class="min-h-[85vh] flex flex-col items-center justify-center text-center max-w-4xl mx-auto mb-24">
+                <div class="relative inline-block mb-8 md:mb-12">
+                    <!-- Adjusted tint to match user's purple-ish post-it -->
+                    <div
+                        class="w-48 h-48 md:w-72 md:h-72 border-none flex flex-col items-center justify-center bg-[#9da8ff] rotate-2 shadow-[4px_4px_10px_0px_rgba(0,0,0,0.3)] space-y-2 p-4">
+                        <span
+                            class="font-marker text-4xl md:text-6xl tracking-tight text-black font-normal leading-none transform -rotate-1">mni
+                            acv</span>
+                        <span
+                            class="font-marker text-4xl md:text-6xl tracking-tight text-black font-normal leading-none transform rotate-1">mni
+                            acv</span>
+                        <span
+                            class="font-marker text-5xl md:text-7xl tracking-tight text-black font-normal leading-none transform -rotate-2">mni
+                            acv</span>
+                    </div>
+                    <div
+                        class="absolute -top-6 -right-6 bg-white border-2 border-black px-3 py-1 font-mono text-xs rotate-12">
+                        #ARCHIVE_01
+                    </div>
+                </div>
+
+                <h2 class="font-mono text-xl md:text-3xl mb-6 leading-relaxed max-w-2xl font-normal text-gray-800">
+                    The chaotic yet lovely universe of Meenoi.<br>
+                    Welcome to the first archive.
+                </h2>
+                <div class="animate-bounce mt-12">
+                    <i class="fa-solid fa-arrow-down text-3xl"></i>
+                </div>
+            </div>
+
+            <!-- Narrative / Story Block -->
+            <div class="max-w-3xl mx-auto space-y-32 mb-32">
+                <!-- Story 1 -->
+                <div class="flex flex-col md:flex-row items-center gap-12 group">
+                    <div
+                        class="w-full md:w-1/2 border-2 border-black p-4 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-1 group-hover:-rotate-1 transition-transform">
+                        <!-- Replaced previous sketch with new blue pants doodle (User Original), uncropped -->
+                        <div
+                            class="aspect-square bg-white flex items-center justify-center overflow-hidden border-2 border-transparent p-2">
+                            <img src="images/blue_pants_sketch.jpg" alt="doodle of pants"
+                                class="w-full h-full object-contain">
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2 text-left">
+                        <h3 class="font-marker text-3xl mb-4">it started with a doodle.</h3>
+                        <p class="font-mono text-gray-600 leading-relaxed text-sm md:text-base">
+                            We don't do "fashion". We do captured moments of chaos.
+                            Every piece in the mni acv collection begins as a midnight scribble on a receipt or a
+                            napkin.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Story 2 -->
+                <div class="flex flex-col md:flex-row-reverse items-center gap-12 group">
+                    <div
+                        class="w-full md:w-1/2 border-2 border-black p-4 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -rotate-1 group-hover:rotate-1 transition-transform">
+                        <!-- User's T-shirt Image -->
+                        <div
+                            class="aspect-square bg-white flex items-center justify-center overflow-hidden border-2 border-transparent p-2">
+                            <img src="images/tshirt_sketch.jpg" alt="mni acv t-shirt design"
+                                class="w-full h-full object-contain">
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2 text-left md:text-right">
+                        <h3 class="font-marker text-3xl mb-4">from trash to treasure.</h3>
+                        <p class="font-mono text-gray-600 leading-relaxed text-sm md:text-base">
+                            Why wear a logo when you can wear a mistake?
+                            Our limited drops turn the imperfections of daily life into wearable statements.
+                            Join the secret club.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links Block -->
+            <div class="max-w-4xl mx-auto text-center border-t-2 border-dashed border-black pt-20">
+                <h3 class="font-scribble text-5xl mb-12">Where do you want to go?</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                    <div onclick="app.navigate('drops')"
+                        class="cursor-pointer border-2 border-black p-8 hover:bg-black hover:text-white transition-all group">
+                        <h4 class="font-mono font-bold text-2xl mb-2">THE DROPS</h4>
+                        <p class="font-mono text-sm opacity-60 group-hover:opacity-100">Get the latest gear before it's
+                            gone.</p>
+                        <div class="mt-4 text-right">
+                            <i class="fa-solid fa-arrow-right text-xl"></i>
+                        </div>
+                    </div>
+                    <div onclick="app.navigate('room')"
+                        class="cursor-pointer border-2 border-black p-8 hover:bg-brand-periwinkle transition-all group">
+                        <h4 class="font-mono font-bold text-2xl mb-2">THE ROOM</h4>
+                        <p class="font-mono text-sm opacity-60 group-hover:opacity-100">Explore the archive of chaos.
+                        </p>
+                        <div class="mt-4 text-right">
+                            <i class="fa-solid fa-arrow-right text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Room Section (Gallery) -->
+        <section id="room"
+            class="section hidden-section min-h-screen flex flex-col items-center justify-center pt-20 pb-4 px-4 overflow-hidden">
+            <h2 class="font-marker text-4xl md:text-5xl mb-2">the room</h2>
+            <p class="font-mono text-gray-600 mb-6 text-sm">a collection of oddities.</p>
+
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 max-w-5xl w-full">
+                <!-- Room Item 1 -->
+                <div class="bg-white p-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                    onclick="app.openModal('images/room_1.jpg')">
+                    <div class="aspect-square bg-gray-50 overflow-hidden flex items-center justify-center">
+                        <img src="images/room_1.jpg" alt="Room Item 1" class="w-full h-full object-contain">
+                    </div>
+                </div>
+
+                <!-- Room Item 2 -->
+                <div class="bg-white p-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                    onclick="app.openModal('images/room_2.jpg')">
+                    <div class="aspect-square bg-gray-50 overflow-hidden flex items-center justify-center">
+                        <img src="images/room_2.jpg" alt="Room Item 2" class="w-full h-full object-contain">
+                    </div>
+                </div>
+
+                <!-- Room Item 3 -->
+                <div class="bg-white p-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                    onclick="app.openModal('images/room_3.jpg')">
+                    <div class="aspect-square bg-gray-50 overflow-hidden flex items-center justify-center">
+                        <img src="images/room_3.jpg" alt="Room Item 3" class="w-full h-full object-contain">
+                    </div>
+                </div>
+
+                <!-- Room Item 4 -->
+                <div class="bg-white p-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                    onclick="app.openModal('images/room_4.jpg')">
+                    <div class="aspect-square bg-gray-50 overflow-hidden flex items-center justify-center">
+                        <img src="images/room_4.jpg" alt="Room Item 4" class="w-full h-full object-contain">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DROPS SECTION (Pre-order) -->
+        <section id="drops"
+            class="section hidden-section min-h-screen flex flex-col items-center justify-center pt-20 pb-4 px-4 overflow-hidden">
+            <div class="max-w-5xl mx-auto text-center w-full">
+                <h2 class="font-marker text-4xl md:text-5xl mb-2">next drop</h2>
+
+                <div id="countdown"
+                    class="font-mono text-xl md:text-3xl bg-black text-brand-periwinkle inline-block px-4 py-2 mb-6 border-4 border-transparent shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    00:00:00:00
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 text-left max-w-4xl mx-auto">
+                    <!-- Product 1 -->
+                    <div
+                        class="border-2 border-black p-4 bg-white relative flex flex-col md:flex-row gap-4 items-center">
+                        <div
+                            class="bg-gray-100 w-32 h-32 md:w-40 md:h-40 shrink-0 flex items-center justify-center border border-black">
+                            <span class="font-scribble text-2xl">Tee</span>
+                        </div>
+                        <div class="w-full">
+                            <h3 class="font-mono font-bold text-lg mb-1 leading-tight">TOILET PAPER TEE</h3>
+                            <p class="font-mono text-xs text-gray-600 mb-2">$80.00 USD</p>
+                            <button
+                                class="w-full py-2 bg-black text-white font-mono text-sm hover:bg-brand-periwinkle hover:text-black transition-colors">
+                                PRE-ORDER
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div
+                        class="border-2 border-black p-4 bg-white relative flex flex-col md:flex-row gap-4 items-center">
+                        <div
+                            class="bg-gray-100 w-32 h-32 md:w-40 md:h-40 shrink-0 flex items-center justify-center border border-black">
+                            <span class="font-scribble text-2xl">Hoodie</span>
+                        </div>
+                        <div class="w-full">
+                            <h3 class="font-mono font-bold text-lg mb-1 leading-tight">STICK HOODIE</h3>
+                            <p class="font-mono text-xs text-gray-600 mb-2">$120.00 USD</p>
+                            <button
+                                class="w-full py-2 bg-black text-white font-mono text-sm hover:bg-brand-periwinkle hover:text-black transition-colors">
+                                PRE-ORDER
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SIGN IN SECTION -->
+        <section id="signin" class="section hidden-section px-4 flex items-center justify-center">
+            <div
+                class="max-w-md w-full border-2 border-black p-6 md:p-8 shadow-[8px_8px_0px_0px_#CCCCFF] bg-white transform rotate-1">
+                <h2 class="font-marker text-3xl md:text-4xl mb-6 md:mb-8 text-center">join the club</h2>
+                <form class="space-y-6">
+                    <div>
+                        <label class="block font-mono text-sm font-bold mb-2">CODENAME</label>
+                        <input type="text"
+                            class="w-full border-2 border-black p-3 font-mono focus:outline-none focus:bg-brand-periwinkle/20 focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    </div>
+                    <div>
+                        <label class="block font-mono text-sm font-bold mb-2">SECRET KEY</label>
+                        <input type="password"
+                            class="w-full border-2 border-black p-3 font-mono focus:outline-none focus:bg-brand-periwinkle/20 focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    </div>
+                    <button type="button"
+                        class="w-full border-2 border-black bg-black text-white font-mono font-bold py-4 hover:bg-white hover:text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+                        ACCESS
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer
+        class="fixed bottom-0 left-0 w-full p-4 flex justify-between items-end mix-blend-difference text-gray-500 z-30 pointer-events-none">
+        <div class="font-mono text-xs">© 2026 MNI ACV</div>
+        <div class="font-mono text-xs text-right">SCRIBBLE BRAND<br>EST. 2026</div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>
