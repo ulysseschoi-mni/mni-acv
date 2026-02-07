@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, ChevronLeft, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import { useCartStore } from "@/stores/cartStore";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -38,7 +39,16 @@ export default function ProductDetail() {
     );
   }
 
+  const addToCart = useCartStore((state) => state.addItem);
+
   const handleAddToCart = () => {
+    addToCart({
+      productId: product.id,
+      productName: product.name,
+      price: product.price,
+      quantity,
+      image: product.imageUrl || undefined,
+    });
     toast.success(`Added ${product.name} x${quantity} to cart!`);
   };
 

@@ -6,6 +6,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
 import Drops from "./pages/Drops";
+import Cart from "./pages/Cart";
 
 function Router() {
   return (
@@ -13,8 +14,7 @@ function Router() {
       <Route path={"/:section"} component={Home} />
       <Route path={"/product/:id"} component={ProductDetail} />
       <Route path={"/drops"} component={Drops} />
-      <Route path={"/:section"} component={Home} />
-      <Route path={"/:section"} component={Home} />
+      <Route path={"/cart"} component={Cart} />
       <Route component={Home} />
     </Switch>
   );

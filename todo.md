@@ -105,3 +105,10 @@
 ## UI 개선: 회원가입 섹션
 - [x] 회원가입 섹션 위치 조정 (네비게이션과의 간격 개선)
 - [x] "JOIN THE CLUB" 텍스트를 "JOIN THE ACV"로 변경
+
+## Phase 16: Phase 4-2 - 장바구니 시스템 (완료)
+- [x] Zustand 장바구니 스토어 초기화 (useCartStore)
+- [x] ProductDetail 페이지 "Add to Cart" 기능 추가
+- [x] 장바구니 페이지 구현 (Cart.tsx)
+- [x] 장바구니 토스트 알림 및 로컬 스토리지 저장
+- [x] 모든 기능 테스트 및 검증 (8개 테스트 통과)
