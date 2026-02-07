@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1770459852504,
+      "tag": "0000_skinny_post",
+      "breakpoints": true
+    }
+  ]
 }
