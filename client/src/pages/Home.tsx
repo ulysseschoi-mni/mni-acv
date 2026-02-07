@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 
 const IMAGE_URLS = {
   blue_pants_sketch: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/QAzaDpzdjFRyPrYY.jpg",
@@ -12,6 +13,7 @@ const IMAGE_URLS = {
 type PageId = "home" | "room" | "drops" | "signin";
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const [showSplash, setShowSplash] = useState(true);
   const [introStep, setIntroStep] = useState(0);
   const [showNav, setShowNav] = useState(false);
@@ -370,9 +372,16 @@ export default function Home() {
           <div className="max-w-5xl mx-auto text-center w-full">
             <h2 className="font-marker text-4xl md:text-5xl mb-2">next drop</h2>
 
-            <div className="font-mono text-xl md:text-3xl bg-black text-brand-periwinkle inline-block px-4 py-2 mb-6 border-4 border-transparent shadow-brutal">
+            <div className="font-mono text-xl md:text-3xl bg-black text-brand-periwinkle inline-block px-4 py-2 mb-8 border-4 border-transparent shadow-brutal">
               {countdown}
             </div>
+
+            <button
+              onClick={() => setLocation("/drops")}
+              className="mb-8 px-6 py-3 bg-brand-periwinkle text-black font-mono font-bold border-2 border-black hover:bg-black hover:text-white transition-all"
+            >
+              전체 Drop 보기 →
+            </button>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 text-left max-w-4xl mx-auto">
               {/* Product 1 */}
