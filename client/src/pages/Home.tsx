@@ -417,7 +417,7 @@ export default function Home() {
 
         {/* SIGN IN SECTION */}
         <section
-          className={`section px-4 flex items-center justify-center pt-20 md:pt-24 ${
+          className={`section px-4 flex items-center justify-center min-h-screen ${
             currentPage === "signin" ? "active animate-slide-up" : "hidden-section"
           }`}
         >
