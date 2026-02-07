@@ -95,3 +95,9 @@
   - App.tsx에 ProductDetail, Drops 라우트 추가
   - Home.tsx에서 Drops 페이지로의 네비게이션 링크 추가
   - wouter 기반 SPA 라우팅 구현
+
+## Phase 15: Phase 4-1 - 주문 API 개발 (완료)
+- [x] 데이터베이스 헬퍼 함수 구현 (주문 생성, 조회, 상태 업데이트)
+- [x] 주문 tRPC 라우터 구현 (create, getById, getUserOrders, updateStatus, cancel)
+- [x] 주문 API 테스트 작성 (17개)
+- [x] 모든 테스트 통과 검증 (31개 테스트 모두 통과)

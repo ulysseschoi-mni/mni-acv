@@ -1,6 +1,6 @@
-import { eq, and, lte, gte } from "drizzle-orm";
+import { eq, and, lte, gte, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, products, drops, dropProducts } from "../drizzle/schema";
+import { InsertUser, users, products, drops, dropProducts, orders, orderItems } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -207,4 +207,189 @@ export async function getDropsByStatus(status: "upcoming" | "active" | "ended") 
   if (!db) return [];
 
   return await db.select().from(drops).where(eq(drops.status, status));
+}
+
+
+// ============================================================================
+// 주문 관련 쿼리
+// ============================================================================
+
+/**
+ * 주문 생성
+ */
+export async function createOrder(userId: number, totalAmount: number, orderNumber: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  try {
+    const result = await db.insert(orders).values({
+      userId,
+      totalAmount,
+      orderNumber,
+      status: "pending",
+    });
+
+    return result[0]?.insertId || undefined;
+  } catch (error) {
+    console.error("[Orders] Error creating order:", error);
+    throw error;
+  }
+}
+
+/**
+ * 주문 항목 추가
+ */
+export async function addOrderItem(
+  orderId: number,
+  productId: number,
+  quantity: number,
+  unitPrice: number,
+  totalPrice: number
+) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  try {
+    await db.insert(orderItems).values({
+      orderId,
+      productId,
+      quantity,
+      unitPrice,
+      totalPrice,
+    });
+    return true;
+  } catch (error) {
+    console.error("[OrderItems] Error adding order item:", error);
+    throw error;
+  }
+}
+
+/**
+ * 주문 ID로 주문 조회
+ */
+export async function getOrderById(orderId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  try {
+    const result = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+    return result[0];
+  } catch (error) {
+    console.error("[Orders] Error fetching order:", error);
+    return undefined;
+  }
+}
+
+/**
+ * 주문 항목 조회
+ */
+export async function getOrderItems(orderId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    return await db
+      .select({
+        orderItem: orderItems,
+        product: products,
+      })
+      .from(orderItems)
+      .leftJoin(products, eq(orderItems.productId, products.id))
+      .where(eq(orderItems.orderId, orderId));
+  } catch (error) {
+    console.error("[OrderItems] Error fetching order items:", error);
+    return [];
+  }
+}
+
+/**
+ * 사용자의 모든 주문 조회
+ */
+export async function getUserOrders(userId: number, limit: number = 20, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    return await db
+      .select()
+      .from(orders)
+      .where(eq(orders.userId, userId))
+      .orderBy(desc(orders.createdAt))
+      .limit(limit)
+      .offset(offset);
+  } catch (error) {
+    console.error("[Orders] Error fetching user orders:", error);
+    return [];
+  }
+}
+
+/**
+ * 사용자의 주문 개수 조회
+ */
+export async function getUserOrderCount(userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  try {
+    const result = await db
+      .select({ count: orders.id })
+      .from(orders)
+      .where(eq(orders.userId, userId));
+    return result.length;
+  } catch (error) {
+    console.error("[Orders] Error counting user orders:", error);
+    return 0;
+  }
+}
+
+/**
+ * 주문 상태 업데이트
+ */
+export async function updateOrderStatus(
+  orderId: number,
+  status: "pending" | "paid" | "failed" | "cancelled"
+) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const updateData: any = { status, updatedAt: new Date() };
+    if (status === "paid") {
+      updateData.paidAt = new Date();
+    } else if (status === "cancelled") {
+      updateData.cancelledAt = new Date();
+    }
+
+    await db.update(orders).set(updateData).where(eq(orders.id, orderId));
+    return true;
+  } catch (error) {
+    console.error("[Orders] Error updating order status:", error);
+    throw error;
+  }
+}
+
+/**
+ * 주문 취소
+ */
+export async function cancelOrder(orderId: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const order = await getOrderById(orderId);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    // pending 상태의 주문만 취소 가능
+    if (order.status !== "pending") {
+      throw new Error(`Cannot cancel order with status: ${order.status}`);
+    }
+
+    await updateOrderStatus(orderId, "cancelled");
+    return true;
+  } catch (error) {
+    console.error("[Orders] Error cancelling order:", error);
+    throw error;
+  }
 }
