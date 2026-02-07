@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and, lte, gte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, products, drops, dropProducts } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,122 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ============================================================================
+// 상품 관련 쿼리
+// ============================================================================
+
+/**
+ * 모든 활성 상품 조회
+ */
+export async function getAllProducts() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(products).where(eq(products.status, "active"));
+}
+
+/**
+ * 상품 ID로 상품 조회
+ */
+export async function getProductById(productId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(products).where(eq(products.id, productId)).limit(1);
+  return result[0];
+}
+
+/**
+ * 카테고리별 상품 조회
+ */
+export async function getProductsByCategory(category: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(products)
+    .where(and(eq(products.status, "active"), eq(products.category, category)));
+}
+
+// ============================================================================
+// Drop 관련 쿼리
+// ============================================================================
+
+/**
+ * 현재 진행 중인 Drop 조회 (활성 상태)
+ */
+export async function getCurrentDrop() {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const now = new Date();
+  const result = await db
+    .select()
+    .from(drops)
+    .where(
+      and(
+        eq(drops.status, "active"),
+        lte(drops.startDate, now),
+        gte(drops.endDate, now)
+      )
+    )
+    .limit(1);
+
+  return result[0];
+}
+
+/**
+ * 다음 예정된 Drop 조회
+ */
+export async function getNextDrop() {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const now = new Date();
+  const result = await db
+    .select()
+    .from(drops)
+    .where(and(eq(drops.status, "upcoming"), gte(drops.startDate, now)))
+    .limit(1);
+
+  return result[0];
+}
+
+/**
+ * Drop ID로 Drop 조회
+ */
+export async function getDropById(dropId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(drops).where(eq(drops.id, dropId)).limit(1);
+  return result[0];
+}
+
+/**
+ * Drop에 포함된 상품 조회
+ */
+export async function getProductsByDropId(dropId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select({
+      dropProduct: dropProducts,
+      product: products,
+    })
+    .from(dropProducts)
+    .innerJoin(products, eq(dropProducts.productId, products.id))
+    .where(eq(dropProducts.dropId, dropId));
+}
+
+/**
+ * 모든 Drop 조회 (상태별)
+ */
+export async function getDropsByStatus(status: "upcoming" | "active" | "ended") {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(drops).where(eq(drops.status, status));
+}

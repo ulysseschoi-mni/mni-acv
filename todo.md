@@ -71,3 +71,11 @@
 - [ ] 주문 생성/조회 API (tRPC)
 - [ ] 멤버십 관리 API (tRPC)
 - [ ] API 테스트
+
+## Phase 13: Phase 2 - 백엔드 API 구현 (완료)
+- [x] 데이터베이스 헬퍼 함수 구현 (상품, Drop 조회)
+- [x] 상품 조회 tRPC 라우터 구현 (list, getById, getByCategory)
+- [x] Drop 조회 tRPC 라우터 구현 (getCurrent, getNext, getById, getProducts, getByStatus, getCurrentCountdown)
+- [x] 상품 API 테스트 작성 (5개 테스트 통과)
+- [x] Drop API 테스트 작성 (8개 테스트 통과)
+- [x] 모든 테스트 검증 완료 (14개 테스트 통과)
