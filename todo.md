@@ -101,3 +101,7 @@
 - [x] 주문 tRPC 라우터 구현 (create, getById, getUserOrders, updateStatus, cancel)
 - [x] 주문 API 테스트 작성 (17개)
 - [x] 모든 테스트 통과 검증 (31개 테스트 모두 통과)
+
+## UI 개선: 회원가입 섹션
+- [x] 회원가입 섹션 위치 조정 (네비게이션과의 간격 개선)
+- [x] "JOIN THE CLUB" 텍스트를 "JOIN THE ACV"로 변경

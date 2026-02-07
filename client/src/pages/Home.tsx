@@ -417,12 +417,12 @@ export default function Home() {
 
         {/* SIGN IN SECTION */}
         <section
-          className={`section px-4 flex items-center justify-center ${
+          className={`section px-4 flex items-center justify-center pt-20 md:pt-24 ${
             currentPage === "signin" ? "active animate-slide-up" : "hidden-section"
           }`}
         >
           <div className="max-w-md w-full border-2 border-black p-6 md:p-8 shadow-brutal-lg bg-white transform rotate-1">
-            <h2 className="font-marker text-3xl md:text-4xl mb-6 md:mb-8 text-center">join the club</h2>
+            <h2 className="font-marker text-3xl md:text-4xl mb-6 md:mb-8 text-center">join the acv</h2>
             <form className="space-y-6">
               <div>
                 <label className="block font-mono text-sm font-bold mb-2">CODENAME</label>
