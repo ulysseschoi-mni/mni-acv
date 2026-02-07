@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { ShoppingCart } from "lucide-react";
+import { useCartStore } from "@/stores/cartStore";
 
 const IMAGE_URLS = {
   blue_pants_sketch: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/QAzaDpzdjFRyPrYY.jpg",
@@ -21,6 +23,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [countdown, setCountdown] = useState("");
+  const getTotalItems = useCartStore((state) => state.getTotalItems);
 
   // Splash screen intro sequence
   useEffect(() => {
@@ -153,7 +156,7 @@ export default function Home() {
           mni acv
         </button>
 
-        <nav className="hidden md:flex space-x-8">
+        <nav className="hidden md:flex space-x-8 items-center">
           <button
             onClick={() => navigate("home")}
             className="font-bold font-mono hover:bg-brand-periwinkle px-2 hover:-rotate-1 transition-all"
@@ -177,6 +180,17 @@ export default function Home() {
             className="font-bold font-mono hover:bg-brand-periwinkle px-2 hover:rotate-1 transition-all"
           >
             SIGN IN
+          </button>
+          <button
+            onClick={() => setLocation("/cart")}
+            className="relative font-bold font-mono hover:bg-brand-periwinkle px-2 hover:rotate-1 transition-all flex items-center"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {getTotalItems() > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {getTotalItems()}
+              </span>
+            )}
           </button>
         </nav>
 
@@ -205,6 +219,16 @@ export default function Home() {
             </button>
             <button onClick={() => navigate("signin")} className="text-left font-mono font-bold text-xl">
               SIGN IN
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setLocation("/cart");
+              }}
+              className="text-left font-mono font-bold text-xl flex items-center gap-2"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              CART {getTotalItems() > 0 && `(${getTotalItems()})`}
             </button>
           </div>
         )}

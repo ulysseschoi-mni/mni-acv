@@ -7,6 +7,8 @@ import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
 import Drops from "./pages/Drops";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Payment from "./pages/Payment";
 
 function Router() {
   return (
@@ -15,6 +17,8 @@ function Router() {
       <Route path={"/product/:id"} component={ProductDetail} />
       <Route path={"/drops"} component={Drops} />
       <Route path={"/cart"} component={Cart} />
+      <Route path={"/checkout"} component={Checkout} />
+      <Route path={"/payment/:orderId"} component={Payment} />
       <Route component={Home} />
     </Switch>
   );

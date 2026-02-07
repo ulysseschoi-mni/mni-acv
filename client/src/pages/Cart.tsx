@@ -26,8 +26,7 @@ export default function Cart() {
       toast.error("Your cart is empty");
       return;
     }
-    toast.success("Proceeding to checkout...");
-    // TODO: Implement checkout flow
+    setLocation("/checkout");
   };
 
   const handleContinueShopping = () => {

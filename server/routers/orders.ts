@@ -16,6 +16,9 @@ import {
   getUserOrders,
   updateOrderStatus,
   cancelOrder,
+  createShipment,
+  getShipmentByOrderId,
+  updateShipment,
 } from "../db";
 import { getProductById } from "../db";
 import { nanoid } from "nanoid";
@@ -321,6 +324,109 @@ export const ordersRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to cancel order",
+        });
+      }
+    }),
+
+  /**
+   * Create or update shipment information for an order
+   */
+  createShipment: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.number().int().positive(),
+        recipientName: z.string().min(1, "Recipient name is required"),
+        recipientPhone: z.string().min(1, "Phone number is required"),
+        address: z.string().min(1, "Address is required"),
+        addressDetail: z.string().optional(),
+        postalCode: z.string().min(1, "Postal code is required"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const order = await getOrderById(input.orderId);
+        if (!order) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Order not found",
+          });
+        }
+
+        // Check authorization
+        if (order.userId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to update this order",
+          });
+        }
+
+        // Check if shipment already exists
+        const existingShipment = await getShipmentByOrderId(input.orderId);
+        if (existingShipment) {
+          // Update existing shipment
+          await updateShipment(input.orderId, {
+            recipientName: input.recipientName,
+            recipientPhone: input.recipientPhone,
+            address: input.address,
+            addressDetail: input.addressDetail,
+            postalCode: input.postalCode,
+            updatedAt: new Date(),
+          });
+        } else {
+          // Create new shipment
+          await createShipment({
+            orderId: input.orderId,
+            recipientName: input.recipientName,
+            recipientPhone: input.recipientPhone,
+            address: input.address,
+            addressDetail: input.addressDetail,
+            postalCode: input.postalCode,
+            status: "pending",
+          });
+        }
+
+        return { success: true, message: "Shipment information saved" };
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Orders] Error creating shipment:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to save shipment information",
+        });
+      }
+    }),
+
+  /**
+   * Get shipment information for an order
+   */
+  getShipment: protectedProcedure
+    .input(z.number().int().positive())
+    .query(async ({ ctx, input: orderId }) => {
+      try {
+        const order = await getOrderById(orderId);
+        if (!order) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Order not found",
+          });
+        }
+
+        // Check authorization
+        if (order.userId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to view this order",
+          });
+        }
+
+        const shipment = await getShipmentByOrderId(orderId);
+        return shipment || null;
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Orders] Error fetching shipment:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch shipment information",
         });
       }
     }),

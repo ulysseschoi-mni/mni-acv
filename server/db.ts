@@ -1,6 +1,6 @@
 import { eq, and, lte, gte, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, products, drops, dropProducts, orders, orderItems } from "../drizzle/schema";
+import { InsertUser, users, products, drops, dropProducts, orders, orderItems, shipments } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -390,6 +390,61 @@ export async function cancelOrder(orderId: number) {
     return true;
   } catch (error) {
     console.error("[Orders] Error cancelling order:", error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// 배송 정보 관련 쿼리
+// ============================================================================
+
+/**
+ * 배송 정보 생성
+ */
+export async function createShipment(shipmentData: any) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  try {
+    const result = await db.insert(shipments).values(shipmentData);
+    return result[0]?.insertId || undefined;
+  } catch (error) {
+    console.error("[Shipments] Error creating shipment:", error);
+    throw error;
+  }
+}
+
+/**
+ * 주문 ID로 배송 정보 조회
+ */
+export async function getShipmentByOrderId(orderId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  try {
+    const result = await db.select().from(shipments).where(eq(shipments.orderId, orderId)).limit(1);
+    return result[0];
+  } catch (error) {
+    console.error("[Shipments] Error fetching shipment:", error);
+    return undefined;
+  }
+}
+
+/**
+ * 배송 정보 업데이트
+ */
+export async function updateShipment(
+  orderId: number,
+  updates: any
+) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.update(shipments).set(updates).where(eq(shipments.orderId, orderId));
+    return true;
+  } catch (error) {
+    console.error("[Shipments] Error updating shipment:", error);
     throw error;
   }
 }
