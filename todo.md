@@ -56,4 +56,18 @@
 ## Phase 10: 테스트 및 배포
 - [x] 전체 기능 테스트
 - [x] 브라우저 호환성 점검
-- [ ] 체크포인트 생성
+- [x] 체크포인트 생성
+
+## Phase 11: Phase 1 - 데이터베이스 마이그레이션 (완료)
+- [x] 주문 관련 테이블 생성 (Orders, OrderItems, Shipments)
+- [x] 상품 및 Drop 테이블 생성 (Products, Drops, DropProducts)
+- [x] 멤버십 테이블 생성 (MembershipPlans, UserMemberships, MembershipPayments)
+- [x] 초기 데이터 입력 (상품, Drop, 멤버십 플랜)
+- [x] Drizzle ORM 스키마 업데이트
+- [x] 데이터베이스 마이그레이션 검증
+
+## Phase 12: Phase 2 - 백엔드 API 구현 (예정)
+- [ ] 상품 조회 API (tRPC)
+- [ ] 주문 생성/조회 API (tRPC)
+- [ ] 멤버십 관리 API (tRPC)
+- [ ] API 테스트
