@@ -370,20 +370,13 @@ export default function Home() {
           }`}
         >
           <div className="max-w-5xl mx-auto text-center w-full">
-            <h2 className="font-marker text-4xl md:text-5xl mb-2">next drop</h2>
+            <h2 className="font-marker text-4xl md:text-5xl mb-8">next drop</h2>
 
-            <div className="font-mono text-xl md:text-3xl bg-black text-brand-periwinkle inline-block px-4 py-2 mb-8 border-4 border-transparent shadow-brutal">
+            <div className="font-mono text-xl md:text-3xl bg-black text-brand-periwinkle inline-block px-4 py-2 mb-12 border-4 border-transparent shadow-brutal">
               {countdown}
             </div>
 
-            <button
-              onClick={() => setLocation("/drops")}
-              className="mb-8 px-6 py-3 bg-brand-periwinkle text-black font-mono font-bold border-2 border-black hover:bg-black hover:text-white transition-all"
-            >
-              전체 Drop 보기 →
-            </button>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 text-left max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 text-left max-w-4xl mx-auto mb-12">
               {/* Product 1 */}
               <div className="border-2 border-black p-4 bg-white relative flex flex-col md:flex-row gap-4 items-center">
                 <div className="bg-gray-100 w-32 h-32 md:w-40 md:h-40 shrink-0 flex items-center justify-center border border-black">
@@ -412,6 +405,13 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            <button
+              onClick={() => setLocation("/drops")}
+              className="mt-12 px-8 py-4 bg-black text-white font-mono font-bold border-2 border-black hover:bg-brand-periwinkle hover:text-black transition-all text-lg"
+            >
+              VIEW ALL DROPS →
+            </button>
           </div>
         </section>
 

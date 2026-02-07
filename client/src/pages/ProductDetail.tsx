@@ -25,13 +25,13 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen pt-32 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="font-marker text-4xl mb-4">상품을 찾을 수 없습니다</h1>
-          <p className="font-mono text-gray-600 mb-8">요청하신 상품이 존재하지 않습니다.</p>
+          <h1 className="font-marker text-4xl mb-4">Product Not Found</h1>
+          <p className="font-mono text-gray-600 mb-8">The product you requested does not exist.</p>
           <Button
             onClick={() => setLocation("/")}
             className="bg-black text-white font-mono font-bold py-3 px-6 border-2 border-black hover:bg-white hover:text-black transition-all"
           >
-            홈으로 돌아가기
+            Back to Home
           </Button>
         </div>
       </div>
@@ -39,11 +39,11 @@ export default function ProductDetail() {
   }
 
   const handleAddToCart = () => {
-    toast.success(`${product.name} ${quantity}개를 장바구니에 추가했습니다!`);
+    toast.success(`Added ${product.name} x${quantity} to cart!`);
   };
 
   const handleBuyNow = () => {
-    toast.success(`${product.name} ${quantity}개를 구매합니다!`);
+    toast.success(`Purchasing ${product.name} x${quantity}...`);
   };
 
   const totalPrice = product.price * quantity;
@@ -51,13 +51,13 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen pt-32 pb-20 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* 뒤로가기 버튼 */}
+        {/* Back button */}
         <button
           onClick={() => setLocation("/")}
           className="flex items-center gap-2 font-mono text-sm mb-8 hover:text-brand-periwinkle transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
-          뒤로가기
+          Back
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
@@ -78,7 +78,7 @@ export default function ProductDetail() {
 
           {/* 상품 정보 */}
           <div className="flex flex-col justify-center">
-            {/* 카테고리 */}
+            {/* Category */}
             {product.category && (
               <div className="mb-4">
                 <span className="inline-block bg-brand-periwinkle text-black font-mono text-xs font-bold px-3 py-1 rounded border-2 border-black">
@@ -87,36 +87,36 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* 상품명 */}
+            {/* Product name */}
             <h1 className="font-marker text-5xl md:text-6xl mb-6 leading-tight">{product.name}</h1>
 
-            {/* 가격 */}
+            {/* Price */}
             <div className="mb-8">
-              <p className="font-mono text-gray-600 text-sm mb-2">가격</p>
-              <p className="font-mono text-4xl font-bold">₩{product.price.toLocaleString()}</p>
+              <p className="font-mono text-gray-600 text-sm mb-2">Price</p>
+              <p className="font-mono text-4xl font-bold">${(product.price / 1000).toFixed(2)}</p>
             </div>
 
-            {/* 설명 */}
+            {/* Description */}
             {product.description && (
               <div className="mb-8 pb-8 border-b-2 border-black">
                 <p className="font-mono text-gray-700 leading-relaxed">{product.description}</p>
               </div>
             )}
 
-            {/* 재고 상태 */}
+            {/* Stock status */}
             <div className="mb-8">
-              <p className="font-mono text-sm mb-2">재고</p>
+              <p className="font-mono text-sm mb-2">Stock</p>
               <div className="flex items-center gap-2">
                 <div className={`w-3 h-3 rounded-full ${(product.stock ?? 0) > 0 ? "bg-green-500" : "bg-red-500"}`} />
                 <p className="font-mono font-bold">
-                  {(product.stock ?? 0) > 0 ? `${product.stock}개 남음` : "품절"}
+                  {(product.stock ?? 0) > 0 ? `${product.stock} available` : "Out of stock"}
                 </p>
               </div>
             </div>
 
-            {/* 수량 선택 */}
+            {/* Quantity selection */}
             <div className="mb-8 pb-8 border-b-2 border-black">
-              <label className="font-mono font-bold text-sm mb-3 block">수량 선택</label>
+              <label className="font-mono font-bold text-sm mb-3 block">Quantity</label>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -150,13 +150,13 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* 총액 */}
+            {/* Total */}
             <div className="mb-8">
-              <p className="font-mono text-sm text-gray-600 mb-2">총액</p>
-              <p className="font-mono text-3xl font-bold">₩{totalPrice.toLocaleString()}</p>
+              <p className="font-mono text-sm text-gray-600 mb-2">Total</p>
+              <p className="font-mono text-3xl font-bold">${(totalPrice / 1000).toFixed(2)}</p>
             </div>
 
-            {/* 액션 버튼 */}
+            {/* Action buttons */}
             <div className="flex gap-4">
               <Button
                 onClick={handleAddToCart}
@@ -164,19 +164,19 @@ export default function ProductDetail() {
                 className="flex-1 bg-white text-black font-mono font-bold py-4 border-2 border-black hover:bg-black hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="w-5 h-5" />
-                장바구니
+                Add to Cart
               </Button>
               <Button
                 onClick={handleBuyNow}
                 disabled={(product.stock ?? 0) === 0}
                 className="flex-1 bg-brand-periwinkle text-black font-mono font-bold py-4 border-2 border-black hover:bg-black hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                바로 구매
+                Buy Now
               </Button>
             </div>
 
             {(product.stock ?? 0) === 0 && (
-              <p className="font-mono text-sm text-red-600 mt-4 text-center">품절된 상품입니다</p>
+              <p className="font-mono text-sm text-red-600 mt-4 text-center">Out of stock</p>
             )}
           </div>
         </div>
