@@ -9,6 +9,9 @@ import Drops from "./pages/Drops";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Payment from "./pages/Payment";
+import OrderComplete from "./pages/OrderComplete";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed";
 
 function Router() {
   return (
@@ -19,6 +22,9 @@ function Router() {
       <Route path={"/cart"} component={Cart} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/payment/:orderId"} component={Payment} />
+      <Route path={"/order-complete/:orderId"} component={OrderComplete} />
+      <Route path={"/payment-success/:orderId"} component={PaymentSuccess} />
+      <Route path={"/payment-failed/:orderId"} component={PaymentFailed} />
       <Route component={Home} />
     </Switch>
   );
