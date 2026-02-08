@@ -127,9 +127,9 @@ export default function Home() {
               }`}
             >
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/rOGDNDEsZbcCurYX.png"
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/EHEseUttmmHnPyyG.png"
                 alt="mni acv logo"
-                className="w-64 h-64 md:w-80 md:h-80 mb-8 hover:animate-wiggle transition-all cursor-pointer"
+                className="w-80 md:w-96 mb-8 hover:animate-wiggle transition-all cursor-pointer"
               />
 
               <div className="transition-transform duration-1000">
@@ -156,9 +156,9 @@ export default function Home() {
           className="z-50 hover:animate-wiggle transition-all"
         >
           <img
-            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/rOGDNDEsZbcCurYX.png"
+            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/KXwCLLoCvCIYtqJm.png"
             alt="mni acv logo"
-            className="w-12 h-12 md:w-14 md:h-14"
+            className="w-12 md:w-14"
           />
         </button>
 
