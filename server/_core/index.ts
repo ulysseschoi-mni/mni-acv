@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { startDropStatusScheduler, stopDropStatusScheduler } from "./dropStatusScheduler";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -59,6 +60,15 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    // Drop 상태 자동 업데이트 스케줄러 시작
+    startDropStatusScheduler();
+  });
+
+  // 서버 종료 시 스케줄러 중지
+  process.on("SIGINT", () => {
+    console.log("\nServer shutting down...");
+    stopDropStatusScheduler();
+    process.exit(0);
   });
 }
 

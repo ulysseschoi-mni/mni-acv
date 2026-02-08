@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Trash2, ChevronLeft, TrendingUp } from "lucide-react";
+import { Loader2, Plus, Trash2, ChevronLeft, TrendingUp, Image } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -398,6 +398,12 @@ export default function AdminDropDetail() {
             className="flex-1 bg-brand-periwinkle text-black font-mono font-bold py-3 border-2 border-black hover:bg-white transition-all"
           >
             Drop 정보 수정
+          </Button>
+          <Button
+            onClick={() => dropId && setLocation(`/admin/drops/${dropId}/banner`)}
+            className="flex-1 bg-brand-periwinkle text-black font-mono font-bold py-3 border-2 border-black hover:bg-white transition-all"
+          >
+            배너 이미지 관리
           </Button>
           <Button
             onClick={() => setLocation("/admin/drops")}

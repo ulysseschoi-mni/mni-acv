@@ -15,12 +15,16 @@ import PaymentFailed from "./pages/PaymentFailed";
 import AdminDrops from "./pages/AdminDrops";
 import AdminDropForm from "./pages/AdminDropForm";
 import AdminDropDetail from "./pages/AdminDropDetail";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminDropBanner from "./pages/AdminDropBanner";
 
 function Router() {
   return (
     <Switch>
+      <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/admin/drops/new"} component={AdminDropForm} />
       <Route path={"/admin/drops/:id/edit"} component={AdminDropForm} />
+      <Route path={"/admin/drops/:id/banner"} component={AdminDropBanner} />
       <Route path={"/admin/drops/:id"} component={AdminDropDetail} />
       <Route path={"/admin/drops"} component={AdminDrops} />
       <Route path={"/:section"} component={Home} />

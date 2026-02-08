@@ -129,3 +129,21 @@
 - [x] 결제 성공 페이지 구현 (PaymentSuccess.tsx)
 - [x] 결제 실패 페이지 구현 (PaymentFailed.tsx)
 - [x] 결제 완료 페이지 테스트 (7개 테스트 통과)
+
+## Phase 4-5: Drop 관리 시스템 - Phase 1 (완료)
+- [x] Drop CRUD 데이터베이스 헬퍼 함수 (8개)
+- [x] Drop CRUD tRPC 라우터 (7개 프로시저)
+- [x] Zod 검증 스키마 (6개)
+- [x] Drop CRUD API 테스트 (25개 테스트 통과)
+
+## Phase 4-6: Drop 관리 시스템 - Phase 2 (완료)
+- [x] AdminDrops 목록 페이지 구현 (테이블, 필터, 페이지네이션)
+- [x] AdminDropForm 생성/수정 폼 (유효성 검증)
+- [x] AdminDropDetail 상세 관리 페이지 (상품 추가/제거, 통계)
+- [x] 관리자 라우트 추가 (/admin/drops, /admin/drops/new, /admin/drops/:id, /admin/drops/:id/edit)
+
+## Phase 4-7: Drop 관리 시스템 - Phase 3 (완료)
+- [x] Drop 상태 자동 업데이트 (백그라운드 작업 - node-cron)
+- [x] 관리자 대시보드 페이지 구현 (/admin)
+- [x] Drop 이미지/배너 관리 (업로드 기능)
+- [x] 전체 기능 테스트
