@@ -12,10 +12,17 @@ import Payment from "./pages/Payment";
 import OrderComplete from "./pages/OrderComplete";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
+import AdminDrops from "./pages/AdminDrops";
+import AdminDropForm from "./pages/AdminDropForm";
+import AdminDropDetail from "./pages/AdminDropDetail";
 
 function Router() {
   return (
     <Switch>
+      <Route path={"/admin/drops/new"} component={AdminDropForm} />
+      <Route path={"/admin/drops/:id/edit"} component={AdminDropForm} />
+      <Route path={"/admin/drops/:id"} component={AdminDropDetail} />
+      <Route path={"/admin/drops"} component={AdminDrops} />
       <Route path={"/:section"} component={Home} />
       <Route path={"/product/:id"} component={ProductDetail} />
       <Route path={"/drops"} component={Drops} />
