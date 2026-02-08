@@ -133,7 +133,7 @@ export default function Home() {
               <div className="transition-transform duration-1000">
                 <button
                   onClick={enterSite}
-                  className="font-scribble text-4xl border-2 border-black px-6 py-2 hover:bg-black hover:text-white transition-all transform hover:-rotate-2 shadow-brutal"
+                  className="font-mono text-4xl border-2 border-black px-6 py-2 hover:bg-black hover:text-white transition-all transform hover:-rotate-2 shadow-brutal"
                 >
                   Start !
                 </button>
