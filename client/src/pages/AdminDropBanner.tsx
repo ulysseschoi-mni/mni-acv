@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import * as React from "react";
 import { useLocation, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -6,6 +7,28 @@ import { Loader2, Upload, Trash2, ChevronLeft, Image as ImageIcon } from "lucide
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+
+// S3 업로드 함수
+async function uploadImageToS3(file: File, dropId: number): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Upload failed");
+    }
+
+    const data = await response.json();
+    return data.url;
+  } catch (error) {
+    throw new Error("S3 업로드 실패");
+  }
+}
 
 export default function AdminDropBanner() {
   const [, setLocation] = useLocation();
@@ -16,6 +39,7 @@ export default function AdminDropBanner() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
+  const [currentBannerUrl, setCurrentBannerUrl] = useState<string | null>(null);
 
   // 관리자 권한 확인
   if (!user || user.role !== "admin") {
@@ -55,6 +79,13 @@ export default function AdminDropBanner() {
   // Drop 조회
   const { data: drop, isLoading: dropLoading } = trpc.drops.getById.useQuery(dropId);
 
+  // 현재 배너 URL 설정
+  useEffect(() => {
+    if (drop && (drop as any).bannerUrl) {
+      setCurrentBannerUrl((drop as any).bannerUrl);
+    }
+  }, [drop]);
+
   // 파일 선택 처리
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,7 +115,7 @@ export default function AdminDropBanner() {
 
   // 이미지 업로드
   const handleUpload = async () => {
-    if (!selectedFile) {
+    if (!selectedFile || !dropId) {
       toast.error("파일을 선택하세요");
       return;
     }
@@ -92,12 +123,11 @@ export default function AdminDropBanner() {
     setIsUploading(true);
 
     try {
-      // 파일을 FormData로 변환
-      const formData = new FormData();
-      formData.append("file", selectedFile);
+      // S3에 업로드
+      const imageUrl = await uploadImageToS3(selectedFile, dropId);
 
-      // S3에 업로드 (실제 구현에서는 서버 API를 통해 업로드)
-      // 현재는 클라이언트 측 처리만 구현
+      // Drop 정보 업데이트 (bannerUrl 저장)
+      // 실제 구현에서는 tRPC를 통해 Drop 정보 업데이트
       toast.success("배너 이미지가 업로드되었습니다");
       setSelectedFile(null);
       setPreviewUrl("");
@@ -160,6 +190,13 @@ export default function AdminDropBanner() {
               <p className="font-mono text-sm font-bold mb-3">미리보기</p>
               <div className="relative w-full h-64 bg-gray-100 rounded border-2 border-black overflow-hidden">
                 <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+              </div>
+            </div>
+          ) : currentBannerUrl ? (
+            <div className="mb-6">
+              <p className="font-mono text-sm font-bold mb-3">현재 배너 이미지</p>
+              <div className="relative w-full h-64 bg-gray-100 rounded border-2 border-black overflow-hidden">
+                <img src={currentBannerUrl} alt="Current Banner" className="w-full h-full object-cover" />
               </div>
             </div>
           ) : (

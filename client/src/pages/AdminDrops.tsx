@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Edit2, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, ChevronLeft, ChevronRight, Download, Search, Pin, PinOff } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -13,6 +13,7 @@ export default function AdminDrops() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [status, setStatus] = useState<"upcoming" | "active" | "ended" | undefined>();
+  const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const limit = 10;
 
@@ -58,9 +59,45 @@ export default function AdminDrops() {
     }
   };
 
+  // CSV 내보내기
+  const handleExportCSV = () => {
+    const drops = dropsData?.items || [];
+    const csvContent = [
+      ["ID", "이름", "설명", "시작일", "종료일", "상태", "생성일"],
+      ...drops.map((drop: any) => [
+        drop.id,
+        drop.name,
+        drop.description || "",
+        new Date(drop.startDate).toLocaleString("ko-KR"),
+        new Date(drop.endDate).toLocaleString("ko-KR"),
+        drop.status === "upcoming" ? "예정" : drop.status === "active" ? "진행 중" : "종료",
+        new Date(drop.createdAt).toLocaleString("ko-KR"),
+      ])
+    ]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `drops-${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("CSV 파일이 다운로드되었습니다");
+  };
+
   const drops = dropsData?.items || [];
   const total = dropsData?.total || 0;
   const totalPages = Math.ceil(total / limit);
+
+  // 검색 필터 적용
+  const filteredDrops = drops.filter((drop: any) =>
+    drop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (drop.description && drop.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -103,33 +140,59 @@ export default function AdminDrops() {
         </div>
 
         {/* Controls */}
-        <div className="mb-8 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-            {/* Status Filter */}
-            <Select value={status || ""} onValueChange={(value) => {
-              setStatus(value === "" ? undefined : (value as any));
-              setPage(0);
-            }}>
-              <SelectTrigger className="w-full md:w-40">
-                <SelectValue placeholder="상태 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">모든 상태</SelectItem>
-                <SelectItem value="upcoming">예정</SelectItem>
-                <SelectItem value="active">진행 중</SelectItem>
-                <SelectItem value="ended">종료</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="mb-8 space-y-4">
+          {/* Search Bar */}
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Drop 이름 또는 설명 검색..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setPage(0);
+                }}
+                className="pl-10 font-mono border-2 border-black"
+              />
+            </div>
+            <Button
+              onClick={handleExportCSV}
+              className="bg-brand-periwinkle text-black font-mono font-bold py-2 px-4 border-2 border-black hover:bg-white transition-all flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              CSV 내보내기
+            </Button>
           </div>
 
-          {/* Create Button */}
-          <Button
-            onClick={() => setLocation("/admin/drops/new")}
-            className="bg-black text-white font-mono font-bold py-2 px-4 border-2 border-black hover:bg-white hover:text-black transition-all flex items-center gap-2 w-full md:w-auto justify-center"
-          >
-            <Plus className="w-4 h-4" />
-            새 Drop 생성
-          </Button>
+          {/* Filters */}
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+              {/* Status Filter */}
+              <Select value={status || ""} onValueChange={(value) => {
+                setStatus(value === "" ? undefined : (value as any));
+                setPage(0);
+              }}>
+                <SelectTrigger className="w-full md:w-40">
+                  <SelectValue placeholder="상태 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">모든 상태</SelectItem>
+                  <SelectItem value="upcoming">예정</SelectItem>
+                  <SelectItem value="active">진행 중</SelectItem>
+                  <SelectItem value="ended">종료</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Create Button */}
+            <Button
+              onClick={() => setLocation("/admin/drops/new")}
+              className="bg-black text-white font-mono font-bold py-2 px-4 border-2 border-black hover:bg-white hover:text-black transition-all flex items-center gap-2 w-full md:w-auto justify-center"
+            >
+              <Plus className="w-4 h-4" />
+              새 Drop 생성
+            </Button>
+          </div>
         </div>
 
         {/* Drop List */}
@@ -137,9 +200,11 @@ export default function AdminDrops() {
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
-        ) : drops.length === 0 ? (
+        ) : filteredDrops.length === 0 ? (
           <Card className="p-8 text-center border-2 border-black">
-            <p className="font-mono text-gray-600 mb-4">Drop이 없습니다</p>
+            <p className="font-mono text-gray-600 mb-4">
+              {searchQuery ? "검색 결과가 없습니다" : "Drop이 없습니다"}
+            </p>
             <Button
               onClick={() => setLocation("/admin/drops/new")}
               className="bg-black text-white font-mono font-bold py-2 px-4 border-2 border-black hover:bg-white hover:text-black transition-all"
@@ -162,12 +227,17 @@ export default function AdminDrops() {
                   </tr>
                 </thead>
                 <tbody>
-                  {drops.map((drop: any, index: number) => (
+                  {filteredDrops.map((drop: any, index: number) => (
                     <tr
                       key={drop.id}
-                      className={`border-t-2 border-black ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                      className={`border-t-2 border-black ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} ${(drop as any).isPinned ? "bg-yellow-50" : ""}`}
                     >
-                      <td className="px-4 py-3 font-mono">{drop.name}</td>
+                      <td className="px-4 py-3 font-mono">
+                        <div className="flex items-center gap-2">
+                          {(drop as any).isPinned && <Pin className="w-4 h-4 text-yellow-600" />}
+                          {drop.name}
+                        </div>
+                      </td>
                       <td className="px-4 py-3">
                         <span className={`inline-block px-3 py-1 rounded font-mono text-xs font-bold ${getStatusBadgeColor(drop.status)}`}>
                           {drop.status === "upcoming" ? "예정" : drop.status === "active" ? "진행 중" : "종료"}
@@ -223,7 +293,7 @@ export default function AdminDrops() {
 
             {/* Info */}
             <div className="mt-4 text-center font-mono text-sm text-gray-600">
-              총 {total}개의 Drop
+              {searchQuery ? `검색 결과: ${filteredDrops.length}개` : `총 ${total}개의 Drop`}
             </div>
           </>
         )}

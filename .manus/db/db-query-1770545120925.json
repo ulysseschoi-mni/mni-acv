@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `drops` ADD COLUMN `bannerUrl` varchar(255), ADD COLUMN `isPinned` boolean DEFAULT false;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 416sKAyoYAY7t9i.root --database Mn9Dg9rESodT4uw3HctnZ9 --execute ALTER TABLE `drops` ADD COLUMN `bannerUrl` varchar(255), ADD COLUMN `isPinned` boolean DEFAULT false;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2718
+}

@@ -52,6 +52,8 @@ export const drops = mysqlTable("drops", {
   startDate: timestamp("startDate").notNull(),
   endDate: timestamp("endDate").notNull(),
   status: mysqlEnum("status", ["upcoming", "active", "ended"]).default("upcoming"),
+  bannerUrl: varchar("bannerUrl", { length: 255 }),
+  isPinned: boolean("isPinned").default(false),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
