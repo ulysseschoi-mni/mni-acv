@@ -29,6 +29,8 @@ const UpdateDropSchema = z.object({
   startDate: z.date().optional(),
   endDate: z.date().optional(),
   status: z.enum(["upcoming", "active", "ended"]).optional(),
+  isPinned: z.boolean().optional(),
+  bannerUrl: z.string().optional(),
 });
 
 const GetAllDropsSchema = z.object({
@@ -346,6 +348,31 @@ export const dropsRouter = router({
       } catch (error) {
         console.error("[Drops] Error fetching stats:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "통계 조회 중 오류가 발생했습니다" });
+      }
+    }),
+
+  togglePin: protectedProcedure
+    .input(z.object({
+      dropId: z.number().int().positive(),
+      isPinned: z.boolean(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Only admins can pin drops" });
+      }
+
+      try {
+        const drop = await getDropById(input.dropId);
+        if (!drop) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Drop not found" });
+        }
+
+        const result = await updateDrop(input.dropId, { isPinned: input.isPinned });
+        return result;
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Drops] Error toggling pin:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to toggle pin status" });
       }
     }),
 });

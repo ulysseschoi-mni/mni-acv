@@ -155,3 +155,9 @@
 - [ ] Drop 고정 기능 (isPinned 컴럼) - DB 추가 완료, UI 구현 대기 중
 - [x] CSV 내보내기 기능 (관리자 대시보드) - AdminDrops 에 추가
 - [ ] 전체 기능 테스트
+
+## Phase 5: Drop 관리 시스템 - 최종 고급 기능 (완료)
+- [x] Drop 고정 기능 완성 (tRPC API + UI 버튼) - togglePin 데이터베이스 및 UI 추가
+- [x] Drop 상태 변경 알림 기능 (백엔드 로직 + 알림 발송) - 콘솔 로그 추가
+- [x] 배너 이미지 S3 저장 완성 (AdminDropBanner 통합) - S3 업로드 및 DB 저장
+- [x] 전체 기능 테스트 및 검증

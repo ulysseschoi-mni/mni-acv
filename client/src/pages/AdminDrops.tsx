@@ -59,6 +59,20 @@ export default function AdminDrops() {
     }
   };
 
+  const togglePinMutation = trpc.drops.togglePin.useMutation({
+    onSuccess: () => {
+      toast.success("Drop 고정 상태가 변경되었습니다");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "고정 상태 변경에 실패했습니다");
+    },
+  });
+
+  const handleTogglePin = (dropId: number, isPinned: boolean) => {
+    togglePinMutation.mutate({ dropId, isPinned });
+  };
+
   // CSV 내보내기
   const handleExportCSV = () => {
     const drops = dropsData?.items || [];
@@ -247,6 +261,13 @@ export default function AdminDrops() {
                       <td className="px-4 py-3 font-mono text-sm">{formatDate(drop.endDate)}</td>
                       <td className="px-4 py-3">
                         <div className="flex justify-center gap-2">
+                          <Button
+                            onClick={() => handleTogglePin(drop.id, !(drop as any).isPinned)}
+                            size="sm"
+                            className={(drop as any).isPinned ? "bg-yellow-200 text-yellow-800 font-mono font-bold border-2 border-yellow-800 hover:bg-yellow-100 transition-all" : "bg-gray-100 text-gray-800 font-mono font-bold border-2 border-gray-800 hover:bg-gray-200 transition-all"}
+                          >
+                            <Pin className="w-4 h-4" />
+                          </Button>
                           <Button
                             onClick={() => setLocation(`/admin/drops/${drop.id}`)}
                             size="sm"

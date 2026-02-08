@@ -79,6 +79,20 @@ export default function AdminDropBanner() {
   // Drop 조회
   const { data: drop, isLoading: dropLoading } = trpc.drops.getById.useQuery(dropId);
 
+  // Drop 업데이트 mutation
+  const updateDropMutation = trpc.drops.update.useMutation({
+    onSuccess: () => {
+      toast.success("Banner image saved");
+      setSelectedFile(null);
+      setPreviewUrl("");
+      setIsUploading(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to save banner");
+      setIsUploading(false);
+    },
+  });
+
   // 현재 배너 URL 설정
   useEffect(() => {
     if (drop && (drop as any).bannerUrl) {
@@ -127,10 +141,10 @@ export default function AdminDropBanner() {
       const imageUrl = await uploadImageToS3(selectedFile, dropId);
 
       // Drop 정보 업데이트 (bannerUrl 저장)
-      // 실제 구현에서는 tRPC를 통해 Drop 정보 업데이트
-      toast.success("배너 이미지가 업로드되었습니다");
-      setSelectedFile(null);
-      setPreviewUrl("");
+      updateDropMutation.mutate({
+        id: dropId,
+        bannerUrl: imageUrl,
+      });
     } catch (error) {
       toast.error("이미지 업로드에 실패했습니다");
       console.error(error);

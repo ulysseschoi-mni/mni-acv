@@ -497,6 +497,8 @@ export async function updateDrop(
     startDate?: Date;
     endDate?: Date;
     status?: "upcoming" | "active" | "ended";
+    isPinned?: boolean;
+    bannerUrl?: string;
   }
 ): Promise<any | null> {
   const db = await getDb();
@@ -509,6 +511,8 @@ export async function updateDrop(
     if (data.startDate !== undefined) updateData.startDate = data.startDate;
     if (data.endDate !== undefined) updateData.endDate = data.endDate;
     if (data.status !== undefined) updateData.status = data.status;
+    if (data.isPinned !== undefined) updateData.isPinned = data.isPinned;
+    if (data.bannerUrl !== undefined) updateData.bannerUrl = data.bannerUrl;
 
     await db.update(drops).set(updateData).where(eq(drops.id, id));
 
@@ -615,6 +619,7 @@ export async function updateDropStatusesAutomatically(): Promise<number> {
     for (const drop of activatingDropsFiltered) {
       await db.update(drops).set({ status: "active" }).where(eq(drops.id, drop.id));
       updatedCount++;
+      console.log(`[Drops] Drop "${drop.name}" is now ACTIVE`);
     }
 
     // active → ended (now >= endDate)
@@ -625,6 +630,7 @@ export async function updateDropStatusesAutomatically(): Promise<number> {
     for (const drop of endingDropsFiltered) {
       await db.update(drops).set({ status: "ended" }).where(eq(drops.id, drop.id));
       updatedCount++;
+      console.log(`[Drops] Drop "${drop.name}" has ENDED`);
     }
 
     return updatedCount;
