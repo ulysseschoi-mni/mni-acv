@@ -158,7 +158,7 @@ export default function Home() {
           <img
             src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/KXwCLLoCvCIYtqJm.png"
             alt="mni acv logo"
-            className="w-12 md:w-14"
+            className="w-20 md:w-24"
           />
         </button>
 
