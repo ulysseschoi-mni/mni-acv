@@ -172,6 +172,29 @@
     animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   
+  @keyframes wiggle {
+    0%, 100% {
+      transform: rotate(0deg) translateX(0);
+    }
+    25% {
+      transform: rotate(-2deg) translateX(-2px);
+    }
+    50% {
+      transform: rotate(2deg) translateX(2px);
+    }
+    75% {
+      transform: rotate(-1deg) translateX(-1px);
+    }
+  }
+  
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
+  
+  .hover\:animate-wiggle:hover {
+    animation: wiggle 0.5s ease-in-out infinite;
+  }
+  
   /* Section visibility control */
   .section {
     min-height: 100vh;

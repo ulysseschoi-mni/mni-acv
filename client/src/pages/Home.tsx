@@ -126,9 +126,11 @@ export default function Home() {
                 introStep >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
             >
-              <h1 className="font-scribble text-7xl md:text-9xl tracking-tighter mb-8 font-normal -rotate-2">
-                mni acv
-              </h1>
+              <img
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/rOGDNDEsZbcCurYX.png"
+                alt="mni acv logo"
+                className="w-64 h-64 md:w-80 md:h-80 mb-8 hover:animate-wiggle transition-all cursor-pointer"
+              />
 
               <div className="transition-transform duration-1000">
                 <button
@@ -151,9 +153,13 @@ export default function Home() {
       >
         <button
           onClick={() => navigate("home")}
-          className="font-scribble text-4xl md:text-5xl z-50 hover:rotate-2 transition-transform font-bold"
+          className="z-50 hover:animate-wiggle transition-all"
         >
-          mni acv
+          <img
+            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663339494644/rOGDNDEsZbcCurYX.png"
+            alt="mni acv logo"
+            className="w-12 h-12 md:w-14 md:h-14"
+          />
         </button>
 
         <nav className="hidden md:flex space-x-8 items-center">
