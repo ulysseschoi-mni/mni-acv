@@ -134,7 +134,8 @@
   }
   
   .font-scribble {
-    font-family: 'Nanum Pen Script', cursive;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
   }
   
   .font-marker {
