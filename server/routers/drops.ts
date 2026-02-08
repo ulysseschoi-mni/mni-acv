@@ -1,12 +1,64 @@
-import { publicProcedure, router } from "../_core/trpc";
 import { z } from "zod";
-import { getCurrentDrop, getNextDrop, getDropById, getProductsByDropId, getDropsByStatus } from "../db";
+import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
+import { TRPCError } from "@trpc/server";
+import { getCurrentDrop, getNextDrop, getDropById, getProductsByDropId, getDropsByStatus, createDrop, updateDrop, deleteDrop, getAllDrops, addProductToDrop, removeProductFromDrop, updateDropProductQuantity, getDropStats } from "../db";
 
 /**
  * Drop 관련 tRPC 라우터
- * 모든 프로시저는 공개(publicProcedure)로 설정
+ * 공개 프로시저는 publicProcedure, 관리 기능은 protectedProcedure + adminProcedure
  */
+
+// ============================================================================
+// Zod 스키마 정의
+// ============================================================================
+
+const CreateDropSchema = z.object({
+  name: z.string().min(1, "Drop 이름은 필수입니다").max(100),
+  description: z.string().max(500).optional(),
+  startDate: z.date(),
+  endDate: z.date(),
+}).refine(data => data.startDate < data.endDate, {
+  message: "startDate는 endDate보다 이른 시간이어야 합니다",
+  path: ["endDate"],
+});
+
+const UpdateDropSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  status: z.enum(["upcoming", "active", "ended"]).optional(),
+});
+
+const GetAllDropsSchema = z.object({
+  status: z.enum(["upcoming", "active", "ended"]).optional(),
+  limit: z.number().int().positive().default(20),
+  offset: z.number().int().nonnegative().default(0),
+});
+
+const AddProductToDropSchema = z.object({
+  dropId: z.number().int().positive(),
+  productId: z.number().int().positive(),
+  limitedQuantity: z.number().int().positive(),
+});
+
+const RemoveProductFromDropSchema = z.object({
+  dropId: z.number().int().positive(),
+  productId: z.number().int().positive(),
+});
+
+const UpdateProductQuantitySchema = z.object({
+  dropId: z.number().int().positive(),
+  productId: z.number().int().positive(),
+  limitedQuantity: z.number().int().positive(),
+});
+
 export const dropsRouter = router({
+  // ========================================================================
+  // 공개 프로시저 (publicProcedure)
+  // ========================================================================
+
   /**
    * 현재 진행 중인 Drop 조회
    * @returns 현재 활성 Drop 정보 또는 null
@@ -107,4 +159,193 @@ export const dropsRouter = router({
       isEnded: false,
     };
   }),
+
+  // ========================================================================
+  // 관리자 전용 프로시저 (protectedProcedure + admin 역할 검증)
+  // ========================================================================
+
+  /**
+   * Drop 생성 (adminProcedure)
+   */
+  create: protectedProcedure
+    .input(CreateDropSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "관리자만 Drop을 생성할 수 있습니다" });
+      }
+
+      try {
+        const dropId = await createDrop(input);
+        if (!dropId) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Drop 생성에 실패했습니다" });
+        }
+        return { id: dropId, ...input, status: "upcoming" };
+      } catch (error) {
+        console.error("[Drops] Error creating drop:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Drop 생성 중 오류가 발생했습니다" });
+      }
+    }),
+
+  /**
+   * Drop 수정 (adminProcedure)
+   */
+  update: protectedProcedure
+    .input(UpdateDropSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "관리자만 Drop을 수정할 수 있습니다" });
+      }
+
+      try {
+        const result = await updateDrop(input.id, input);
+        if (!result) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Drop을 찾을 수 없습니다" });
+        }
+        return result;
+      } catch (error: any) {
+        if (error.code) throw error;
+        console.error("[Drops] Error updating drop:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Drop 수정 중 오류가 발생했습니다" });
+      }
+    }),
+
+  /**
+   * Drop 삭제 (adminProcedure)
+   */
+  delete: protectedProcedure
+    .input(z.number().int().positive())
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "관리자만 Drop을 삭제할 수 있습니다" });
+      }
+
+      try {
+        const success = await deleteDrop(input);
+        return { success, message: "Drop이 삭제되었습니다" };
+      } catch (error: any) {
+        if (error.message.includes("active")) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "진행 중인 Drop은 삭제할 수 없습니다" });
+        }
+        console.error("[Drops] Error deleting drop:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Drop 삭제 중 오류가 발생했습니다" });
+      }
+    }),
+
+  /**
+   * 모든 Drop 조회 (관리자용)
+   */
+  getAll: protectedProcedure
+    .input(GetAllDropsSchema.optional())
+    .query(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "관리자만 모든 Drop을 조회할 수 있습니다" });
+      }
+
+      try {
+        return await getAllDrops(input);
+      } catch (error) {
+        console.error("[Drops] Error fetching all drops:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Drop 조회 중 오류가 발생했습니다" });
+      }
+    }),
+
+  /**
+   * Drop에 상품 추가 (adminProcedure)
+   */
+  addProduct: protectedProcedure
+    .input(AddProductToDropSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "관리자만 상품을 Drop에 추가할 수 있습니다" });
+      }
+
+      try {
+        const result = await addProductToDrop(input);
+        if (!result) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "상품 추가에 실패했습니다" });
+        }
+        return result;
+      } catch (error: any) {
+        if (error.message.includes("not found")) {
+          throw new TRPCError({ code: "NOT_FOUND", message: error.message });
+        }
+        if (error.message.includes("already added")) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "이미 추가된 상품입니다" });
+        }
+        console.error("[Drops] Error adding product:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "상품 추가 중 오류가 발생했습니다" });
+      }
+    }),
+
+  /**
+   * Drop에서 상품 제거 (adminProcedure)
+   */
+  removeProduct: protectedProcedure
+    .input(RemoveProductFromDropSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "관리자만 상품을 Drop에서 제거할 수 있습니다" });
+      }
+
+      try {
+        const success = await removeProductFromDrop(input.dropId, input.productId);
+        return { success, message: "상품이 제거되었습니다" };
+      } catch (error: any) {
+        if (error.message.includes("not found")) {
+          throw new TRPCError({ code: "NOT_FOUND", message: error.message });
+        }
+        console.error("[Drops] Error removing product:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "상품 제거 중 오류가 발생했습니다" });
+      }
+    }),
+
+  /**
+   * Drop 상품 한정 수량 수정 (adminProcedure)
+   */
+  updateProductQuantity: protectedProcedure
+    .input(UpdateProductQuantitySchema)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "관리자만 수량을 수정할 수 있습니다" });
+      }
+
+      try {
+        const result = await updateDropProductQuantity(input.dropId, input.productId, input.limitedQuantity);
+        if (!result) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "상품을 찾을 수 없습니다" });
+        }
+        return result;
+      } catch (error: any) {
+        if (error.message.includes("not found")) {
+          throw new TRPCError({ code: "NOT_FOUND", message: error.message });
+        }
+        if (error.message.includes("cannot be less")) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "한정 수량은 판매 수량보다 작을 수 없습니다" });
+        }
+        console.error("[Drops] Error updating quantity:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "수량 수정 중 오류가 발생했습니다" });
+      }
+    }),
+
+  /**
+   * Drop 판매 통계 (adminProcedure)
+   */
+  getStats: protectedProcedure
+    .input(z.number().int().positive())
+    .query(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "관리자만 통계를 조회할 수 있습니다" });
+      }
+
+      try {
+        const result = await getDropStats(input);
+        if (!result) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Drop을 찾을 수 없습니다" });
+        }
+        return result;
+      } catch (error) {
+        console.error("[Drops] Error fetching stats:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "통계 조회 중 오류가 발생했습니다" });
+      }
+    }),
 });
